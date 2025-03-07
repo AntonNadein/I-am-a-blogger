@@ -1,0 +1,23 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}login{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-8">
+            <h2>Вход на сайт</h2>
+            <div>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-secondary">Войти</button>
+                </form>
+                <a href="{% url 'users:password_reset' %}"
+                   class="link-secondary">Забыли пароль?</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
