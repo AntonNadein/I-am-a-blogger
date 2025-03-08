@@ -2,7 +2,8 @@
     <header class="border-bottom lh-1 py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
-                <a class="link-secondary" href="#">Subscribe</a>
+                <a class="link-secondary" href="{% url 'blog:index' %}">Главная страница</a>
+                <a class="link-secondary" href="{% url 'blog:index2' %}">Главная страница 2</a>
             </div>
             <div class="col-4 text-center">
                 <a class="blog-header-logo text-body-emphasis text-decoration-none" href="#">Large</a>
@@ -36,17 +37,9 @@
     <div class="nav-scroller py-1 mb-3 border-bottom">
         <nav class="nav nav-underline justify-content-between">
             <a class="nav-item nav-link link-body-emphasis active" href="#">World</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">U.S.</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Technology</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Design</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Culture</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Business</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Politics</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Opinion</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Science</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Health</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Style</a>
-            <a class="nav-item nav-link link-body-emphasis" href="#">Travel</a>
+            {% for topic in topic_list %}
+            <a class="nav-item nav-link link-body-emphasis" href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% endfor %}
         </nav>
     </div>
 </div>

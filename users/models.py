@@ -7,9 +7,9 @@ class ModelUser(AbstractUser):
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     token = models.CharField(max_length=100, null=True, blank=True, verbose_name="Токен")
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "username"
     REQUIRED_FIELDS = [
-        "username",
+        "email",
     ]
 
     def __str__(self):

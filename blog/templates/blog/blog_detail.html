@@ -1,0 +1,21 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ object.title }}{% endblock %}
+{% block content %}
+
+<h1 class="mt-5 text-center">{{ object.title }}</h1>
+<div class="col-1"></div>
+<div class="col-10">
+    <div class="mt-5 card-body text-start">
+    {% if object.image %}
+    <img class="rounded float-start img-fluid" width="30%" height="200" src="{{ object.image.url }}">
+    {% endif %}
+        <p class="card-text">Автор: {{ object.blog_text|safe }}</p>
+    <p>Дата публикации: {{ object.created_at|date:"d M Y" }}</p>
+    <p>Количество книг: {{ autor_books_count }}</p>
+        </div>
+    <div class="mt-5">
+    <a href="{% url 'blog:blog_update' object.pk %}" class="btn btn-secondary">Редактировать</a>
+    <a href="{% url 'blog:blog_delete' object.pk %}" class="btn btn-danger">Удалить</a>
+    <a href="{% url 'blog:blog_list' %}" class="btn btn-light border-primary text-primary">Назад</a></div>
+</div>
+{% endblock %}

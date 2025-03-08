@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ topic.title }}{% endblock %}
+{% block content %}
+<h1>{{ topic.title }}</h1>
+<p>{{ topic.description }}</p>
+<hr class="featurette-divider">
+{% for article in articles %}
+<p>{{ article.title }}</p>
+<p>{{ article.blog_text|truncatechars:300|safe }}</p>
+<hr class="featurette-divider">
+{% endfor %}
+{% endblock %}
