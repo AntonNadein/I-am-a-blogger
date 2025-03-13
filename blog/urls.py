@@ -16,4 +16,5 @@ urlpatterns = [
     path("delete/<int:pk>/", views.BlogDeleteView.as_view(), name="blog_delete"),
 
     path('topic_detail/<str:title>/', views.TopicDetailView.as_view(), name='topic_detail'),
+    path("archive/", views.ListArchive.as_view(), name="archive")
 ]

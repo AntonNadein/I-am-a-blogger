@@ -5,16 +5,16 @@
     <div class="row justify-content-center mt-5">
         <div class="col-10">
             {% if object %}
-            <h2>Редактирование статьи</h2>
+            <h2>Редактирование записи</h2>
             {% else %}
-            <h2>Добавление статьи</h2>
+            <h2>Добавление записи</h2>
             {% endif %}
             <div>
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit" class="btn btn-secondary">Сохранить</button>
-                    <a href="{% url 'blog:blog_list' %}" class="btn btn-outline-secondary">Отменить</a>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Сохранить</button>
+                    <a href="{% url 'blog:blog_list' %}" class="btn btn-sm btn-outline-primary">Отменить</a>
                 </form >
                 <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
                 <script>

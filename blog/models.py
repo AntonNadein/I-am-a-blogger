@@ -11,7 +11,8 @@ class Blog(models.Model):
     blog_text = RichTextField(verbose_name="Содержимое статьи")
     image = models.ImageField(upload_to="blog/%Y/%m/%d/", null=True, blank=True, verbose_name="Превью (изображение)")
     created_at = models.DateField(auto_now_add=True, verbose_name="Дата создания")
-    is_published = models.BooleanField(default=True, verbose_name="Опубликовать")
+    is_published = models.BooleanField(default=True, verbose_name="Опубликовать",
+                                       help_text="Поставте галочку, что-бы запись видели все")
     view_count = models.PositiveIntegerField(default=0, verbose_name="Количество просмотров")
     like = models.PositiveIntegerField(default=0, verbose_name="Количество лайков")
     owner = models.ForeignKey(

@@ -14,6 +14,7 @@ class BlogAdmin(admin.ModelAdmin):
         "created_at",
         "is_published",
         "view_count",
+        "like",
     )
     list_filter = (
         "created_at",

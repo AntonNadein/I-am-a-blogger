@@ -9,4 +9,6 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         call_command("loaddata", "topic.json")
+        call_command("loaddata", "users.json")
+        call_command("loaddata", "blog.json")
         self.stdout.write(self.style.SUCCESS("Фикстуры успешно загружены"))

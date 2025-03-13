@@ -2,11 +2,11 @@
     <header class="border-bottom lh-1 py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
-                <a class="link-secondary" href="{% url 'blog:index' %}">Главная страница</a>
-                <a class="link-secondary" href="{% url 'blog:index2' %}">Главная страница 2</a>
+                <a class="fs-4 blog-header-logo text-body-emphasis text-decoration-none" href="{% url 'blog:index' %}">Главная страница</a>
+
             </div>
             <div class="col-4 text-center">
-                <a class="blog-header-logo text-body-emphasis text-decoration-none" href="#">Large</a>
+                <a class="fs-1 blog-header-logo text-body-emphasis text-decoration-none" href="{% url 'blog:index' %}">Название блога</a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
                 <a class="link-secondary" href="#" aria-label="Search">
@@ -18,6 +18,7 @@
                     </svg>
                 </a>
                 {% if user.is_authenticated %}
+                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'blog:blog_list' %}">Мой блог</a>
                 <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:profile' user.pk %}">Профиль</a>
                 <form method="post" action="{% url 'users:logout' %}">
                     {% csrf_token %}
@@ -25,7 +26,8 @@
                     </button>
                 </form>
                 {% else %}
-                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:register' %}">Зарегистрироваться</a>
+                <a class="ms-2 btn btn-sm btn-outline-secondary"
+                   href="{% url 'users:register' %}">Зарегистрироваться</a>
                 <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:login' %}">Войти</a>
 
 
@@ -36,9 +38,13 @@
 
     <div class="nav-scroller py-1 mb-3 border-bottom">
         <nav class="nav nav-underline justify-content-between">
-            <a class="nav-item nav-link link-body-emphasis active" href="#">World</a>
             {% for topic in topic_list %}
-            <a class="nav-item nav-link link-body-emphasis" href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% if topic.title == topic_title %}
+                <a class="nav-item nav-link link-body-emphasis active" href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% else %}
+            <a class="nav-item nav-link link-body-emphasis"
+               href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% endif %}
             {% endfor %}
         </nav>
     </div>

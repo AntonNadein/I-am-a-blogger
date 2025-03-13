@@ -1,14 +1,13 @@
 {% extends 'blog/base.html' %}
-{% block title %}{{ topic.title }}{% endblock %}
+{% block title %}Архив{% endblock %}
 {% block content %}
 
-<h1 class="mt-5 text-center">{{ topic.title }}</h1>
-<h3 class="mt-5 text-center">{{ topic.description }}</h3>
-<hr class="featurette-divider">
-<div class="col-12">
-    <div class="mt-5 row row-cols-1 row-cols-md-1 g-4">
+<h1 class="mt-5 text-center">Архив</h1>
+<div class="row">
+<div class="col-10">
+    <div class="mt-2 row row-cols-1 row-cols-md-1 g-4">
         <div class="col">
-            {% for article in articles %}
+            {% for article in object_list %}
             <div class="mt-5 card text-start border-dark">
                 <h4 class="card-header">{{ article.title }}</h4>
                 <a href="{% url 'blog:blog_detail' article.pk %}" class="btn btn-light border-secondary text-secondary">Подробнее</a>
@@ -27,6 +26,14 @@
         </div>
     </div>
 </div>
+<div class="col-2 mt-5 row row-cols-1 row-cols-md-1 g-4">
+    <ul class="list-unstyled">
+        {% for archive in archives %}
+        <li><a href="#">{{ archive.month }} ({{ archive.count }})</a></li>
+        {% endfor %}
+    </ul>
+</div>
+    </div>
 <hr>
 {% include 'blog/includes/nav_pagination.html' %}
 {% endblock %}
