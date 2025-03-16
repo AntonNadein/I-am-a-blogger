@@ -6,6 +6,10 @@ class ModelUser(AbstractUser):
     email = models.EmailField(unique=True)
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     token = models.CharField(max_length=100, null=True, blank=True, verbose_name="Токен")
+    subscriber = models.ManyToManyField(
+        "self", null=True, blank=True, related_name="blog_subscriber",
+        verbose_name="Подписчик"
+    )
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = [
@@ -21,4 +25,3 @@ class ModelUser(AbstractUser):
         permissions = [
             ("can_block_user", "Can block user"),
         ]
-

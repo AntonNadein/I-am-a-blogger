@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$870000$SS0l7DSCWBNlzEJPfdMI9s$EF+RSY5X9q/CFuA0gZlCNacXrTSgtk45VuL7TJyFbQA=",
-        "last_login": null,
+        "last_login": "2025-03-16T16:00:58.947Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -16,7 +16,8 @@
         "avatar": "",
         "token": null,
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [],
+        "subscriber": []
     }
 },
 {
@@ -24,7 +25,7 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$870000$Ce0dBpMjGenrs4SED40ELD$iyszvHQloBQIqG/3A0NK2jeCXbkr2Rg+bpNhiJyKW1M=",
-        "last_login": "2025-03-09T09:54:00.783Z",
+        "last_login": "2025-03-16T10:49:45.020Z",
         "is_superuser": false,
         "username": "Toxa_kak_toxa",
         "first_name": "",
@@ -36,7 +37,10 @@
         "avatar": "",
         "token": "ecd5a382b961ee625bf213e87c6fa9b4",
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [],
+        "subscriber": [
+            3
+        ]
     }
 },
 {
@@ -44,19 +48,22 @@
     "pk": 3,
     "fields": {
         "password": "pbkdf2_sha256$870000$ooTgxALntFCA8PfBWsea4r$lF3ivKZkIH2UIGEdd1hwETrpMgK4D8jki35FyxiqqoE=",
-        "last_login": "2025-03-09T10:16:26.310Z",
+        "last_login": "2025-03-09T10:16:26Z",
         "is_superuser": false,
         "username": "Toxa",
         "first_name": "",
         "last_name": "",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-03-09T10:16:06.079Z",
+        "date_joined": "2025-03-09T10:16:06Z",
         "email": "Fynjy-6662@yandex.ru",
         "avatar": "",
         "token": "6d983d2445c24024e9fd4d81d9adbbee",
         "groups": [],
-        "user_permissions": []
+        "user_permissions": [],
+        "subscriber": [
+            2
+        ]
     }
 }
 ]

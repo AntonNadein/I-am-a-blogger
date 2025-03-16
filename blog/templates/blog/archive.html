@@ -26,14 +26,10 @@
         </div>
     </div>
 </div>
-<div class="col-2 mt-5 row row-cols-1 row-cols-md-1 g-4">
-    <ul class="list-unstyled">
-        {% for archive in archives %}
-        <li><a href="#">{{ archive.month }} ({{ archive.count }})</a></li>
-        {% endfor %}
-    </ul>
-</div>
+    <div class="col-2 mt-5 row row-cols-1 row-cols-md-1 g-4">
+{% include 'blog/includes/archive.html' %}
     </div>
+</div>
 <hr>
 {% include 'blog/includes/nav_pagination.html' %}
 {% endblock %}

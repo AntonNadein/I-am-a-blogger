@@ -14,7 +14,6 @@ class BlogAdmin(admin.ModelAdmin):
         "created_at",
         "is_published",
         "view_count",
-        "like",
     )
     list_filter = (
         "created_at",
@@ -24,17 +23,17 @@ class BlogAdmin(admin.ModelAdmin):
     )
     search_fields = ("title",)
     ordering = ("created_at",)
-    filter_horizontal = ("subscriber",)
     list_display_links = ("title",)
     list_per_page = 20
+    filter_horizontal = ("like",)
     fields = [
         "title",
         "topic",
         "blog_text",
         "image",
         "owner",
-        ("view_count", "like", "is_published"),
-        "subscriber",
+        ("view_count", "is_published"),
+        "like",
     ]
 
 

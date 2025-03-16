@@ -13,7 +13,9 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
+                    {% if user == blog.owner %}
                     <button type="submit" class="btn btn-sm btn-outline-secondary">Сохранить</button>
+                    {% endif %}
                     <a href="{% url 'blog:blog_list' %}" class="btn btn-sm btn-outline-primary">Отменить</a>
                 </form >
                 <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>

@@ -1,0 +1,33 @@
+{% extends 'blog/base.html' %}
+{% block title %}Результаты поиска{% endblock %}
+{% block content %}
+
+<h1 class="mt-5 text-center">Результаты поиска</h1>
+<div class="col-12">
+    <div class="mt-5 row row-cols-1 row-cols-md-1 g-4">
+        <div class="col">
+            {% for blog in blogs %}
+            <div class="mt-5 card text-start border-dark">
+                <h4 class="card-header">{{ blog.title }}</h4>
+                <a href="{% url 'blog:blog_detail' blog.pk %}" class="btn btn-light border-secondary text-secondary">Подробнее</a>
+                <div class="card-body text-center">
+                    {% if blog.image %}
+                    <img class="rounded float-start img-fluid" width="20%" height="200" src="{{ blog.image.url }}">
+                    {% endif %}
+                    <p class="card-text">{{ blog.blog_text|truncatechars:300|safe }}</p>
+                </div>
+            </div>
+
+            {% empty %}
+            <hr>
+            <h3 class="mt-5 text-center">Нет результатов по вашему запросу.</h3>
+            {% endfor %}
+            <div class="col-1">
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr>
+{% include 'blog/includes/nav_pagination.html' %}
+{% endblock %}

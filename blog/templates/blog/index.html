@@ -103,15 +103,7 @@
             </div>
 
             <div class="p-4">
-                <h4 class="fst-italic">Архив статей</h4>
-                <hr>
-                <ol class="list-unstyled mb-0">
-                    <li><a href="{% url 'blog:archive' %}">Весь архив</a></li>
-                    <hr>
-                    {% for archive in archives %}
-                    <li><a href="#">{{ archive.month }} ({{ archive.count }})</a></li>
-                    {% endfor %}
-                </ol>
+                {% include 'blog/includes/archive.html' %}
             </div>
         </div>
     </div>

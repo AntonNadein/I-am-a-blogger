@@ -9,7 +9,9 @@
         <p>Вы действительно хотите удалить: {{ object.title }}?</p>
         <form method="post">
             {% csrf_token %}
+            {% if user == blog.owner %}
             <button type="submit" class="btn btn-sm btn-outline-danger">Подтвердить</button>
+            {% endif %}
             <a href="{% url 'blog:blog_list' %}" class="btn btn-sm btn-outline-primary">Отменить</a>
         </form>
     </div>

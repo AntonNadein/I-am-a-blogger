@@ -45,7 +45,6 @@ class Command(BaseCommand):
              "image": "blog/2025/03/09/Vacuum.jpg",
              "is_published": True,
              "view_count": 44,
-             "like": 22,
              "owner": user, },
             {"title": "VR (Виртуальная реальность)",
              "topic": topic,
@@ -53,7 +52,6 @@ class Command(BaseCommand):
              "image": "blog/2025/03/09/Vr.jpg",
              "is_published": True,
              "view_count": 22,
-             "like": 44,
              "owner": user, },
         ]
 

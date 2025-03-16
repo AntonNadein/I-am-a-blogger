@@ -10,19 +10,37 @@
         <img class="rounded float-start img-fluid" width="50%" height="200" src="{{ object.image.url }}">
         {% endif %}
         <p class="card-text">{{ object.blog_text|safe }}</p>
-        <p>Дата публикации: {{ object.created_at|date:"d M Y" }}</p>
+        <p>Автор: {{ object.owner.username }}</p>
         <p>Дата публикации: {{ object.created_at|date:"d M Y" }}</p>
     </div>
     <div class="col-12 d-flex justify-content-end align-items-center">
         <div class="col-9">
-            <a href="{% url 'blog:blog_update' object.pk %}" class="ms-2 btn btn-sm btn-outline-secondary">Лайки: {{ object.like }}</a>
-            <a href="#" class="ms-2 btn btn-sm btn-outline-secondary">Просмотры: {{ object.view_count }}</a>
-            <a href="#" class="ms-2 btn btn-sm btn-outline-secondary">Подписаться на автора</a>
+            <a href="#" class="mt-2 btn btn-sm btn-outline-secondary">Просмотры: {{ object.view_count }}</a>
+            {% if user != blog.owner %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="subscription" class="mt-2 btn btn-sm {% if subscriber == 'Отписаться' %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">{{ subscriber }}</button>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li
+                    {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </form>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="like" class="mt-2 btn btn-sm {% if like_user %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">Лайк: {{ like }}</button>
+            </form>
+            {% endif %}
         </div>
         <div class="col-3">
+            {% if user == blog.owner %}
             <a href="{% url 'blog:blog_update' object.pk %}"
                class="ms-2 btn btn-sm btn-outline-secondary">Редактировать</a>
             <a href="{% url 'blog:blog_delete' object.pk %}" class="ms-2 btn btn-sm btn-outline-danger">Удалить</a>
+            {% endif %}
             <a href="{% url 'blog:blog_list' %}" class="ms-2 btn btn-sm btn-outline-primary">Назад</a>
         </div>
 

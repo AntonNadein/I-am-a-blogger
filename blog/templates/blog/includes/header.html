@@ -47,5 +47,13 @@
             {% endif %}
             {% endfor %}
         </nav>
+        <nav>
+            <div class="d-flex flex-row-reverse bd-highlight">
+            <form class="d-flex" method="get" action="{% url 'blog:search' %}">
+                    <input class="form-control me-2" name="search" type="search" placeholder="Введите текст" value="{{ request.GET.search|default:'' }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Найти</button>
+                </form>
+            </div>
+        </nav>
     </div>
 </div>

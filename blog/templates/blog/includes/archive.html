@@ -1,0 +1,15 @@
+<ul class="list-unstyled">
+    <li><a href="{% url 'blog:archive' %}">Весь архив</a></li>
+    <hr>
+    {% regroup archives by year as archives_list %}
+    {% for archives in archives_list %}
+    {{ archives.grouper }}
+    {% for archive in archives.list %}
+    {% if request.resolver_match.view_name == 'blog:index' %}
+            <li><a href="{% url 'blog:archive' %}?month={{ archive.month }}">{{ archive.month }} ({{ archive.count }})</a></li>
+        {% else %}
+    <li><a class="link" href="?month={{ archive.month }}">{{ archive.month }} ({{ archive.count }})</a></li>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+</ul>

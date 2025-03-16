@@ -14,12 +14,12 @@ class Blog(models.Model):
     is_published = models.BooleanField(default=True, verbose_name="Опубликовать",
                                        help_text="Поставте галочку, что-бы запись видели все")
     view_count = models.PositiveIntegerField(default=0, verbose_name="Количество просмотров")
-    like = models.PositiveIntegerField(default=0, verbose_name="Количество лайков")
+    like = models.ManyToManyField(
+        ModelUser, null=True, blank=True, related_name="blog_subscriber",
+        verbose_name="Лайкнули"
+    )
     owner = models.ForeignKey(
         ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="blog", verbose_name="Владелец"
-    )
-    subscriber = models.ManyToManyField(
-        ModelUser, blank=True, related_name="blog_subscriber", verbose_name="Подписчик"
     )
 
     def __str__(self):
