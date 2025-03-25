@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
         "password": "pbkdf2_sha256$870000$SS0l7DSCWBNlzEJPfdMI9s$EF+RSY5X9q/CFuA0gZlCNacXrTSgtk45VuL7TJyFbQA=",
-        "last_login": "2025-03-16T16:00:58.947Z",
+        "last_login": "2025-03-23T09:38:32.782Z",
         "is_superuser": true,
         "username": "admin",
         "first_name": "",
@@ -15,6 +15,7 @@
         "email": "test@test.ru",
         "avatar": "",
         "token": null,
+        "_stripe_secret": "gAAAAABn3qu1Wb4BcLO1sk2OJm0DlbCcrjbXpEFYiUOFHpEKFF-XQwXoVXfb0WQyRKlLcQEcMWoUYoNgjH57_a3dXMAWCzI0vreDGV9ptaGg0Z3EXRAnH19vIvrQBQa2fnt-4MMtwumAIy1Xh3yKgRGPMHmP8NJsS3z57mMN8G75BghBV7jcLnC4y2fiPfho5kwzbvOJKb82Q63zA9ax4MXIc0AF3XHajQ==",
         "groups": [],
         "user_permissions": [],
         "subscriber": []
@@ -25,22 +26,23 @@
     "pk": 2,
     "fields": {
         "password": "pbkdf2_sha256$870000$Ce0dBpMjGenrs4SED40ELD$iyszvHQloBQIqG/3A0NK2jeCXbkr2Rg+bpNhiJyKW1M=",
-        "last_login": "2025-03-16T10:49:45.020Z",
+        "last_login": "2025-03-23T09:34:39Z",
         "is_superuser": false,
         "username": "Toxa_kak_toxa",
         "first_name": "",
         "last_name": "",
         "is_staff": false,
         "is_active": true,
-        "date_joined": "2025-03-09T09:53:38.444Z",
+        "date_joined": "2025-03-09T09:53:38Z",
         "email": "fynjy-666@mail.ru",
         "avatar": "",
         "token": "ecd5a382b961ee625bf213e87c6fa9b4",
-        "groups": [],
+        "_stripe_secret": "gAAAAABn3qtxgnwKVzkHlJJIVrjwrWS009UZ02i1W8I0rQuGmCX1JOjOu7o0VPGKUyKIYGAGxeKTJkmMBYBxKVywmgAc4LdSDF8SqubvfVYb_F5D83E1alExQsVAk5BLBYUNLwRbCyG2BKxrc6fqWM07dlsHYL3L-jHj3LxE4yMRmn6zklUAQAKUKcXLkJJed1n_H5nfHEEZGPeE7wAU0rLLopcei8smIA==",
+        "groups": [
+            1
+        ],
         "user_permissions": [],
-        "subscriber": [
-            3
-        ]
+        "subscriber": []
     }
 },
 {
@@ -59,11 +61,36 @@
         "email": "Fynjy-6662@yandex.ru",
         "avatar": "",
         "token": "6d983d2445c24024e9fd4d81d9adbbee",
-        "groups": [],
+        "_stripe_secret": null,
+        "groups": [
+            1
+        ],
         "user_permissions": [],
-        "subscriber": [
+        "subscriber": []
+    }
+},
+{
+    "model": "users.modeluser",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$GwAxM9X9lHIr72GOMr7r4z$qKTlwMDEJAxbFP3fNvSTQELB9QMACzXTC0iUEvoJivU=",
+        "last_login": "2025-03-23T11:53:11.063Z",
+        "is_superuser": false,
+        "username": "admin_2",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-03-22T12:26:53Z",
+        "email": "test3@test.ru",
+        "avatar": "",
+        "token": "8d790f28a64dcb900b2d2330e2e137e1",
+        "_stripe_secret": null,
+        "groups": [
             2
-        ]
+        ],
+        "user_permissions": [],
+        "subscriber": []
     }
 }
 ]

@@ -17,11 +17,14 @@
                     {{ form.as_p }}
                     <button type="submit" class="btn btn-secondary">
                         {% if object %}
-                            Применить
+                        Применить
                         {% else %}
-                            Зарегистрироваться
+                        Зарегистрироваться
                         {% endif %}
                     </button>
+                    {% if object %}
+                    <a href="{% url 'users:profile' object.pk %}" class="btn btn btn-secondary " role="button">Назад</a>
+                    {% endif %}
                 </form>
             </div>
         </div>

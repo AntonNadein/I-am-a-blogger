@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from blog.models import Blog, Topic
+from blog.models import Blog, Topic, Payment, PaidBlog
+
+admin.site.register(PaidBlog)
+admin.site.register(Payment)
 
 
 @admin.register(Blog)
@@ -31,7 +34,7 @@ class BlogAdmin(admin.ModelAdmin):
         "topic",
         "blog_text",
         "image",
-        "owner",
+        ("owner", "is_paid"),
         ("view_count", "is_published"),
         "like",
     ]

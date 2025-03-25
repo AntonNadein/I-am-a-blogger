@@ -4,6 +4,7 @@
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-10">
+
             {% if object %}
             <h2>Редактирование записи</h2>
             {% else %}
@@ -13,11 +14,14 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    {% if user == blog.owner %}
+                    {% if object and user == blog.owner %}
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">Сохранить</button>
+                    {% elif not object %}
                     <button type="submit" class="btn btn-sm btn-outline-secondary">Сохранить</button>
                     {% endif %}
                     <a href="{% url 'blog:blog_list' %}" class="btn btn-sm btn-outline-primary">Отменить</a>
-                </form >
+
+                </form>
                 <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
                 <script>
                     CKEDITOR.replace('blog_text');  // Замените 'id_blog_text' на id вашего текстового поля
@@ -26,5 +30,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePriceField(checkbox) {
+        const priceField = document.getElementById('id_price');
+        if (checkbox.checked) {
+            priceField.disabled = false; // Активируем поле price
+        } else {
+            priceField.disabled = true; // Деактивируем поле price
+            priceField.value = ''; // Очищаем значение, если чекбокс снят
+        }
+    }
+</script>
 
 {% endblock %}

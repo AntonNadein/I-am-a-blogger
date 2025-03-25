@@ -8,6 +8,13 @@
         <div class="col-8">
             <h2>Вход на сайт</h2>
             <div>
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
                 <form method="post">
                     {% csrf_token %}
                     {{ form.as_p }}

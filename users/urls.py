@@ -49,7 +49,11 @@ urlpatterns = [
         PasswordResetCompleteView.as_view(template_name="users/password_reset_complete.html"),
         name="password_reset_complete",
     ),
+
     # Работа с профилем
     path("profile/<int:pk>/", views.UserDetailView.as_view(), name="profile"),
     path("profile_update/<int:pk>/", views.UserUpdateView.as_view(), name="profile_update"),
+    # Модерация
+    path("list_users/", views.ModerationUsersView.as_view(), name="moderation_user_list"),
+    path("users/<int:pk>/block/", views.ModerationUsersView.as_view(), name="block_user"),
 ]

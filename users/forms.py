@@ -11,15 +11,6 @@ class MixinForms:
         for field_name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
 
-
-class MixinValidUsers:
-    """Миксин для проверки валидности получаемых данных"""
-#     def clean_phone_number(self):
-#         phone_number = self.cleaned_data.get("phone_number")
-#         if phone_number and not phone_number.isdigit():
-#             raise forms.ValidationError("Номер телефона должен состоять только из цифр")
-#         return phone_number
-
     def clean_avatar(self):
         """ Проверка изображения на соответствие параметров """
         avatar = self.cleaned_data.get("avatar")
@@ -55,7 +46,7 @@ class UserSetPasswordForm(MixinForms, SetPasswordForm):
     pass
 
 
-class CustomUserCreationForm(MixinForms, UserCreationForm, MixinValidUsers):
+class CustomUserCreationForm(MixinForms, UserCreationForm):
     """Форма регистрации профиля"""
 
     username = forms.CharField(max_length=100, required=True)
@@ -65,16 +56,28 @@ class CustomUserCreationForm(MixinForms, UserCreationForm, MixinValidUsers):
         fields = (
             "email",
             "username",
-            # "phone_number",
             "password1",
             "password2",
             "avatar",
         )
 
 
-class ProfileUserForm(MixinForms, forms.ModelForm, MixinValidUsers):
+class ProfileUserForm(MixinForms, forms.ModelForm):
     """Форма профиля"""
+
+    stripe_secret = forms.CharField(max_length=250, required=False, label='Stripe Secret')
 
     class Meta:
         model = ModelUser
-        fields = ("last_name", "first_name", "username", "avatar",)
+        fields = ("last_name", "first_name", "username", "avatar")
+
+    def save(self, commit=True):
+        """ Добавление stripe_secret через сеттер """
+
+        user = super().save(commit=False)
+        stripe_secret = self.cleaned_data.get('stripe_secret')
+        if stripe_secret:
+            user.stripe_secret = stripe_secret
+        if commit:
+            user.save()
+        return user

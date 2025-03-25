@@ -1,12 +1,14 @@
 import secrets
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 from config.settings import EMAIL_HOST_USER
@@ -33,13 +35,17 @@ class UserCreateView(CreateView):
         url = f"http://{host}/users/confirm/{token}/"
 
         self.send_welcome_mail(user.email, url)
+        messages.success(self.request,
+                         "На вашу почту отправлено письмо, для подтверждения"
+                         " регистрации перейдите по ссылке в описании")
         return super().form_valid(form)
 
     def send_welcome_mail(self, user_email, url):
         """Отправка приветственного сообщения"""
+
         subject = "Добро пожаловать на наш сайт"
         message = (
-            f"Спасибо, что зарегистрировались в нашем интернет магазине!\n"
+            f"Спасибо, что зарегистрировались на нашем сервисе!\n"
             f"Для подтверждения регистрации перейдите по ссылке {url}"
         )
         from_email = EMAIL_HOST_USER
@@ -53,8 +59,8 @@ def email_verification(request, token):
     """Активация и добавление прав пользователю"""
     user = get_object_or_404(ModelUser, token=token)
     user.is_active = True
-    # group = Group.objects.get(name="Пользователь")
-    # user.groups.add(group)
+    group = Group.objects.get(name="Пользователь")
+    user.groups.add(group)
     user.save()
     return redirect(reverse("users:login"))
 
@@ -95,3 +101,42 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("users:profile", kwargs={"pk": self.object.pk})
+
+
+class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin,
+                          ListView):  # добавить CachedViewMixin перед ListView
+    """Просмотр списка пользователей сервиса"""
+
+    model = ModelUser
+    context_object_name = "users"
+    template_name = "users/list_users.html"
+    permission_required = "users.can_block_user"
+
+    def get_queryset(self):
+        """Получает queryset, пытаясь использовать кэш."""
+        # queryset = self.get_cached_queryset()
+        # if queryset is not None:
+        #     return queryset
+
+        queryset = super().get_queryset()
+        queryset = queryset.filter(groups__name="Пользователь")
+        # self.cache_queryset(queryset)
+
+        return queryset
+
+    def post(self, request, pk):
+        """ Блокировка пользователя """
+        user = get_object_or_404(ModelUser, id=pk)
+
+        if not request.user.has_perm("users.can_block_user"):
+            return HttpResponseForbidden("У вас нет прав для блокировки пользователей.")
+
+        if user.is_active:
+            user.is_active = False
+            messages.success(request, f"Пользователь {user.username} успешно заблокирован.")
+        else:
+            user.is_active = True
+            messages.success(request, f"Пользователь {user.username} разблокирован.")
+        user.save()
+
+        return redirect("users:moderation_user_list")

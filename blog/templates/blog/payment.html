@@ -1,0 +1,17 @@
+{% extends 'blog/base.html' %}
+
+{% block title%}Форма оплаты{% endblock%}
+
+{% block content %}
+<h2 class="mt-5 text-center">Оплата контента</h2>
+<div class="col-12 text-center">
+    <div>
+        <h4>Добрый день: {{ pay.buyers.username }}</h4>
+        <h5>Вы решили приобрести: {{ price.paid_blog.title }}</h5>
+        <h5>За цену: {{ price.price }} рублей</h5>
+        <p>Вы будете перенаправлены в сервис для оплаты</p>
+        <a href="{{ pay.link }}" class="ms-2 btn btn-sm btn-outline-primary">Оплатить</a>
+    </div>
+</div>
+
+{% endblock %}
