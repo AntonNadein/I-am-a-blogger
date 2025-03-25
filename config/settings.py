@@ -1,4 +1,5 @@
 import os
+import sys
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -66,6 +67,15 @@ DATABASES = {
         "PORT": os.getenv("PORT"),
     }
 }
+
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "test_db.sqlite3",
+        }
+    }
+
 
 LOGIN_REDIRECT_URL = "blog:index"
 LOGIN_URL = "users:login"
