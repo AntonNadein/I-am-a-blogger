@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Max, Count, Q
 from django.http import HttpResponseForbidden, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView

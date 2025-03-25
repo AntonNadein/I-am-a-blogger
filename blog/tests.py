@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 
 from blog.models import Topic, Blog
 from users.models import ModelUser
@@ -35,4 +35,3 @@ class ModelTests(TestCase):
     def test_owner_blog(self):
         """ Тест связи блога и владельца """
         self.assertEqual(self.blog.owner, self.user)
-

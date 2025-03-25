@@ -22,7 +22,7 @@ class Blog(models.Model):
         ModelUser, on_delete=models.CASCADE, null=True, blank=True, related_name="blog", verbose_name="Владелец"
     )
     is_paid = models.BooleanField(default=False, verbose_name="Платный контент",
-                                       help_text="Поставте галочку, что-бы добавить оплату")
+                                  help_text="Поставте галочку, что-бы добавить оплату")
 
     def __str__(self):
         return self.title
