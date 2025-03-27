@@ -14,6 +14,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from config.settings import EMAIL_HOST_USER
 from users.forms import CustomUserCreationForm, ProfileUserForm, UserAuthenticationForm
 from users.models import ModelUser
+from blog.services.cache import CachedViewMixin
 
 
 class UserCreateView(CreateView):
@@ -86,42 +87,64 @@ class UserDetailView(DetailView):
         return queryset.filter(id=user_id)
 
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, CachedViewMixin, UpdateView):
     """Представление редактирования профиля"""
 
     model = ModelUser
     form_class = ProfileUserForm
     template_name = "users/register.html"
+    cache_timeout = 300
 
     def get_queryset(self):
-        """Фильтрует queryset для владельца обьекта"""
+        """Фильтрует queryset для владельца объекта с использованием кэша """
+        if not self.request.method == 'POST':
+            queryset = self.get_cached_queryset()
+            if queryset is not None:
+                return queryset
+
         queryset = super().get_queryset()
         user_id = self.request.user.id
-        return queryset.filter(id=user_id)
+        queryset = queryset.filter(id=user_id)
+        self.cache_queryset(queryset)
+        return queryset
+
+    def get_initial(self):
+        """ Добавление цены в форму, если цена существует """
+        initial = super().get_initial()
+        user_profile = self.get_object()
+        try:
+            initial['stripe_secret'] = user_profile.stripe_secret
+        except ValueError:
+            # Если нет связанного PaidBlog, просто не добавляем цену
+            initial['stripe_secret'] = ''
+
+        return initial
 
     def get_success_url(self):
         return reverse_lazy("users:profile", kwargs={"pk": self.object.pk})
 
 
-class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin,
-                          ListView):  # добавить CachedViewMixin перед ListView
+class ModerationUsersView(LoginRequiredMixin,
+                          PermissionRequiredMixin,
+                          CachedViewMixin,
+                          ListView):
     """Просмотр списка пользователей сервиса"""
 
     model = ModelUser
     context_object_name = "users"
     template_name = "users/list_users.html"
     permission_required = "users.can_block_user"
+    cache_key = "moderation_users_cache"
 
     def get_queryset(self):
         """Получает queryset, пытаясь использовать кэш."""
-        # queryset = self.get_cached_queryset()
-        # if queryset is not None:
-        #     return queryset
+
+        queryset = self.get_cached_queryset()
+        if queryset is not None:
+            return queryset
 
         queryset = super().get_queryset()
-        queryset = queryset.filter(groups__name="Пользователь")
-        # self.cache_queryset(queryset)
-
+        self.cache_queryset(queryset)
         return queryset
 
     def post(self, request, pk):
@@ -138,5 +161,5 @@ class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin,
             user.is_active = True
             messages.success(request, f"Пользователь {user.username} разблокирован.")
         user.save()
-
+        self.clear_cached()
         return redirect("users:moderation_user_list")

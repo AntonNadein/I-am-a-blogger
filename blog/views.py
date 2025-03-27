@@ -14,7 +14,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from blog.forms import BlogCreationForm
 from blog.models import Blog, Topic, Payment, PaidBlog
-from blog.servicies.stripe import StripePaid
+from blog.services.stripe import StripePaid
 from config.settings import MEDIA_ROOT
 
 
