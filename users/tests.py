@@ -208,7 +208,11 @@ class ModerationUsersViewTests(TestCase):
         self.client.login(username='testuser', password='password')
         self.assertContains(response, 'testuser')
         cached_response = self.client.get(reverse('users:moderation_user_list'))
+        cached_queryset = cache.get("moderation_users_cache")
+        cached_usernames = [str(user) for user in cached_queryset]
 
+        self.assertCountEqual(cached_usernames,
+                              ["admin", "testuser", "test_user_2"])
         self.assertEqual(response.headers, cached_response.headers)  # Сравниваем содержимое
         # self.assertEqual(response.content, cached_response.content)     # не работает!?
 
@@ -229,8 +233,7 @@ class LoginUsersViewTests(TestCase):
     def test_user_login(self):
         """ Проверяем, что test_user может посетить сайт """
 
-        self.client.login(username='test_user', password='password')
-        response = self.client.get(reverse('users:login'))
+        response = self.client.post(reverse('users:login'), {'username': 'test_user', 'password': 'password'})
         self.assertEqual(response.status_code, 200)
 
     def test_user_not_login(self):
@@ -244,6 +247,8 @@ class LoginUsersViewTests(TestCase):
 
 
 class UserDetailViewTests(TestCase):
+    """ Тест информации профиля """
+
     def setUp(self):
         """ Создаем тестовых пользователей """
 

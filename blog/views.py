@@ -1,10 +1,9 @@
-import calendar
 import os
 from datetime import datetime
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Max, Count, Q
+from django.db.models import Q
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -14,11 +13,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from blog.forms import BlogCreationForm
 from blog.models import Blog, Topic, Payment, PaidBlog
+from blog.services.index_page import ServiceIndex
 from blog.services.stripe import StripePaid
 from config.settings import MEDIA_ROOT
 
 
-class ListIndex(ListView):
+class ListIndex(ServiceIndex, ListView):
     """Главная страница"""
 
     model = Blog
@@ -30,60 +30,40 @@ class ListIndex(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         """ Контекст для главной станицы """
+
         context = super().get_context_data(**kwargs)
-        blog_objects = self.get_queryset()
+        self.blog_objects = self.get_queryset()
 
         # Находим максимальное значение view_count и фильтруем бд по данному объекту
-        max_view_count = blog_objects.aggregate(Max('view_count'))['view_count__max']
-        max_object_queryset = blog_objects.filter(view_count=max_view_count).first()
-        context["max_object_queryset"] = max_object_queryset
+        max_view_count = self.get_max_view_count()
+        context["max_object_queryset"] = self.get_max_view_count()
 
-        # Находим максимальное значение like и фильтруем бд по данному объекту
-        today = datetime.utcnow().date()
-        blog_today = blog_objects.filter(created_at=today)
-        max_view_count = blog_today.aggregate(Max('view_count'))['view_count__max']
-        max_view_count_today = blog_today.filter(view_count=max_view_count).first()
-        if max_view_count_today:
-            context["max_like_today"] = max_view_count_today
+        # максимальное значение like сегодня
+        max_view_count_count_today = self.get_max_view_count_today()
+        if max_view_count_count_today:
+            context["max_like_today"] = max_view_count_count_today
         else:
-            context["max_like_today"] = max_object_queryset
+            context["max_like_today"] = max_view_count
 
-        # Находим максимальное значение like и фильтруем бд по данному объекту за месяц
-        date_month = datetime.utcnow().date().month
-        blog_month = blog_objects.filter(created_at__month=date_month)
-        max_like_month = blog_month.annotate(like_count=Count('like')).order_by('-like_count').first()
-        context["max_like_month"] = max_like_month
+        # максимальное значение like за месяц
+        context["max_like_month"] = self.get_max_like_month()
 
         # Последние 3 сообщения
-        context["last_three_articles"] = blog_objects[0:3]
+        context["last_three_articles"] = self.get_last_three_articles()
 
-        # Архив по месяцам
-        archives = blog_objects.dates('created_at', 'month', order='DESC')[:12]
-        context['archives'] = [
-            {
-                'year': archive.year,
-                'month': archive.strftime('%B %Y'),
-                'count': blog_objects.filter(created_at__year=archive.year, created_at__month=archive.month).count()
-            }
-            for archive in archives
-        ]
-
+        # Архив за 12 месяцев
+        context['archives'] = self.get_archives()
         return context
 
     def get_queryset(self):
         """ QuerySet сортировок архива по месяцам"""
-        queryset = super().get_queryset()
+
+        self.queryset_page = super().get_queryset()
         page_link = self.request.GET.get('month')
-        if page_link is None:
-            return queryset.filter(is_published=True)
-        else:
-            list_month_year = page_link.split(" ")
-            number_month = list(calendar.month_name).index(list_month_year[0])
-            return queryset.filter(created_at__year=list_month_year[1], created_at__month=number_month,
-                                   is_published=True)
+        return self.get_queryset_archive(page_link)
 
 
-class ListArchive(ListView):
+class ListArchive(ServiceIndex, ListView):
     """ Архив полностью и по месяцам """
 
     model = Blog
@@ -95,31 +75,15 @@ class ListArchive(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        blog_objects = self.get_queryset()
-
-        archives = blog_objects.dates('created_at', 'month', order='DESC')
-        context['archives'] = [
-            {
-                'year': archive.year,
-                'month': archive.strftime('%B %Y'),
-                'count': blog_objects.filter(created_at__year=archive.year, created_at__month=archive.month).count()
-            }
-            for archive in archives
-        ]
-
+        self.blog_objects = self.get_queryset()
+        context['archives'] = self.get_archives(False)
         return context
 
     def get_queryset(self):
         """ QuerySet сортировок архива по месяцам"""
-        queryset = super().get_queryset()
+        self.queryset_page = super().get_queryset()
         page_link = self.request.GET.get('month')
-        if page_link is None:
-            return queryset.filter(is_published=True)
-        else:
-            list_month_year = page_link.split(" ")
-            number_month = list(calendar.month_name).index(list_month_year[0])
-            return queryset.filter(created_at__year=list_month_year[1], created_at__month=number_month,
-                                   is_published=True)
+        return self.get_queryset_archive(page_link)
 
 
 class BlogListView(LoginRequiredMixin, ListView):
