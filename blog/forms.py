@@ -74,20 +74,6 @@ class BlogCreationForm(MixinForms, forms.ModelForm):
                 )
         return is_paid
 
-        # if is_paid:
-        #     if price != '':
-        #         if not price.isdigit():
-        #             raise ValidationError("Введите численное значение")
-        #         else:
-        #             if int(price) > 500000:
-        #                 raise ValidationError("Превышен максимальный порог цены")
-        #     else:
-        #         if self.initial.get("price") is None or self.initial.get("price") == "":
-        #             raise ValidationError("Вы забыли добавить цену, снимите галочку оплаты или добавьте цену")
-        #
-        #
-        # return cleaned_data
-
     def clean_price(self):
         """Валидация цены"""
 
