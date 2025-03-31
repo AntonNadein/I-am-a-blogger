@@ -6,7 +6,8 @@ from blog.services.stripe import StripePaid
 
 
 class ServiceDetail:
-    """ Сервисные функции связанных с детальным представлением блога """
+    """Сервисные функции связанных с детальным представлением блога"""
+
     def __init__(self):
 
         self.owner_blog = None
@@ -17,7 +18,7 @@ class ServiceDetail:
         self.blog_objects = None
 
     def manage_subscriber(self, request):
-        """ Метод добавления и удаление подписок """
+        """Метод добавления и удаление подписок"""
 
         subscriber_list = self.owner_blog.subscriber
         if "subscription" in request.POST:
@@ -30,7 +31,7 @@ class ServiceDetail:
             messages.success(request, message)
 
     def manage_like(self, request):
-        """ Метод добавления и удаление лайков """
+        """Метод добавления и удаление лайков"""
 
         likes_list = self.blog.like
         if "like" in request.POST:
@@ -40,7 +41,7 @@ class ServiceDetail:
                 likes_list.add(self.subscriber)
 
     def manage_payment(self, request):
-        """ Метод добавления и удаление платежей """
+        """Метод добавления и удаление платежей"""
 
         if "payment" in request.POST:
             paid_blog = self.blog.payment
@@ -51,7 +52,8 @@ class ServiceDetail:
                 stripe_id, stripe_url = stripe_pay.get_stripe()
             except ValueError:
                 return HttpResponseForbidden(
-                    "Пользователь не добавил данные о оплате, обратитесь к администрации сайта.")
+                    "Пользователь не добавил данные о оплате, обратитесь к администрации сайта."
+                )
 
             self.payment.link = stripe_url
             self.payment.session_id = stripe_id
@@ -61,7 +63,7 @@ class ServiceDetail:
         return False
 
     def get_context_subscriber(self):
-        """ Метод получения подписок для контекста """
+        """Метод получения подписок для контекста"""
 
         subscriber_list = self.blog_objects.owner.subscriber.all()
         if self.user in subscriber_list:
@@ -69,14 +71,14 @@ class ServiceDetail:
         return "Подписаться на автора"
 
     def get_context_like(self):
-        """ Метод получения лайков для контекста """
+        """Метод получения лайков для контекста"""
 
         if self.user in self.blog_objects.like.all():
             return True
         return False
 
     def get_context_payments(self):
-        """ Метод получения платежей для контекста """
+        """Метод получения платежей для контекста"""
 
         if self.blog_objects.is_paid:
             list_paid = []

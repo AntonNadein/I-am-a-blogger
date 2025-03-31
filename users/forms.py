@@ -12,7 +12,7 @@ class MixinForms:
             field.widget.attrs["class"] = "form-control"
 
     def clean_avatar(self):
-        """ Проверка изображения на соответствие параметров """
+        """Проверка изображения на соответствие параметров"""
         avatar = self.cleaned_data.get("avatar")
         if avatar:
             valid_formats = ["image/jpeg", "image/png"]
@@ -65,17 +65,17 @@ class CustomUserCreationForm(MixinForms, UserCreationForm):
 class ProfileUserForm(MixinForms, forms.ModelForm):
     """Форма профиля"""
 
-    stripe_secret = forms.CharField(max_length=250, required=False, label='Stripe Secret')
+    stripe_secret = forms.CharField(max_length=250, required=False, label="Stripe Secret")
 
     class Meta:
         model = ModelUser
         fields = ("last_name", "first_name", "username", "avatar")
 
     def save(self, commit=True):
-        """ Добавление stripe_secret через сеттер """
+        """Добавление stripe_secret через сеттер"""
 
         user = super().save(commit=False)
-        stripe_secret = self.cleaned_data.get('stripe_secret')
+        stripe_secret = self.cleaned_data.get("stripe_secret")
         if stripe_secret:
             user.stripe_secret = stripe_secret
         if commit:

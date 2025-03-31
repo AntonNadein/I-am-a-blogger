@@ -11,10 +11,10 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
+from blog.services.cache import CachedViewMixin
 from config.settings import EMAIL_HOST_USER
 from users.forms import CustomUserCreationForm, ProfileUserForm, UserAuthenticationForm
 from users.models import ModelUser
-from blog.services.cache import CachedViewMixin
 
 
 class UserCreateView(CreateView):
@@ -36,9 +36,10 @@ class UserCreateView(CreateView):
         url = f"http://{host}/users/confirm/{token}/"
 
         self.send_welcome_mail(user.email, url)
-        messages.success(self.request,
-                         "На вашу почту отправлено письмо, для подтверждения"
-                         " регистрации перейдите по ссылке в описании")
+        messages.success(
+            self.request,
+            "На вашу почту отправлено письмо, для подтверждения" " регистрации перейдите по ссылке в описании",
+        )
         return super().form_valid(form)
 
     def send_welcome_mail(self, user_email, url):
@@ -96,8 +97,8 @@ class UserUpdateView(LoginRequiredMixin, CachedViewMixin, UpdateView):
     cache_timeout = 300
 
     def get_queryset(self):
-        """Фильтрует queryset для владельца объекта с использованием кэша """
-        if not self.request.method == 'POST':
+        """Фильтрует queryset для владельца объекта с использованием кэша"""
+        if not self.request.method == "POST":
             queryset = self.get_cached_queryset()
             if queryset is not None:
                 return queryset
@@ -109,14 +110,14 @@ class UserUpdateView(LoginRequiredMixin, CachedViewMixin, UpdateView):
         return queryset
 
     def get_initial(self):
-        """ Добавление цены в форму, если цена существует """
+        """Добавление цены в форму, если цена существует"""
         initial = super().get_initial()
         user_profile = self.get_object()
         try:
-            initial['stripe_secret'] = user_profile.stripe_secret
+            initial["stripe_secret"] = user_profile.stripe_secret
         except ValueError:
             # Если нет связанного PaidBlog, просто не добавляем цену
-            initial['stripe_secret'] = ''
+            initial["stripe_secret"] = ""
 
         return initial
 
@@ -124,10 +125,7 @@ class UserUpdateView(LoginRequiredMixin, CachedViewMixin, UpdateView):
         return reverse_lazy("users:profile", kwargs={"pk": self.object.pk})
 
 
-class ModerationUsersView(LoginRequiredMixin,
-                          PermissionRequiredMixin,
-                          CachedViewMixin,
-                          ListView):
+class ModerationUsersView(LoginRequiredMixin, PermissionRequiredMixin, CachedViewMixin, ListView):
     """Просмотр списка пользователей сервиса"""
 
     model = ModelUser
@@ -148,7 +146,7 @@ class ModerationUsersView(LoginRequiredMixin,
         return queryset
 
     def post(self, request, pk):
-        """ Блокировка пользователя """
+        """Блокировка пользователя"""
         user = get_object_or_404(ModelUser, id=pk)
 
         if not request.user.has_perm("users.can_block_user"):

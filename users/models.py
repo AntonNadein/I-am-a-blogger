@@ -11,7 +11,8 @@ secret_key = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest
 
 
 class ModelUser(AbstractUser):
-    """ Модель пользователя """
+    """Модель пользователя"""
+
     email = models.EmailField(unique=True)
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     token = models.CharField(max_length=100, null=True, blank=True, verbose_name="Токен")
@@ -35,7 +36,7 @@ class ModelUser(AbstractUser):
 
     @property
     def stripe_secret(self):
-        """ Получение расшифрованного ключа """
+        """Получение расшифрованного ключа"""
         if self._stripe_secret is None:
             raise ValueError("Stripe secret is not set")
         fernet = Fernet(secret_key)
@@ -47,8 +48,8 @@ class ModelUser(AbstractUser):
 
     @stripe_secret.setter
     def stripe_secret(self, secret):
-        """ Шифрование ключа stripe перед сохранением """
+        """Шифрование ключа stripe перед сохранением"""
         if not isinstance(secret, str):
             raise ValueError("Secret must be a string")
         fernet = Fernet(secret_key)
-        self._stripe_secret = fernet.encrypt(secret.encode()).decode('utf-8')
+        self._stripe_secret = fernet.encrypt(secret.encode()).decode("utf-8")

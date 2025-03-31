@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    """ Добавление стартовых данных на сайт """
+    """Добавление стартовых данных на сайт"""
+
     help = "Load test data from fixture"
 
     def handle(self, *args, **kwargs):

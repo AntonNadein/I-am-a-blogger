@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from blog.models import Blog, Topic, Payment, PaidBlog
+from blog.models import Blog, PaidBlog, Payment, Topic
 
 admin.site.register(PaidBlog)
 admin.site.register(Payment)
@@ -8,7 +8,7 @@ admin.site.register(Payment)
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
-    """ Админка блога """
+    """Админка блога"""
 
     list_display = (
         "id",
@@ -42,7 +42,7 @@ class BlogAdmin(admin.ModelAdmin):
 
 @admin.register(Topic)
 class TopicAdmin(admin.ModelAdmin):
-    """ Админка тематик блогов """
+    """Админка тематик блогов"""
 
     list_display = (
         "id",
@@ -56,4 +56,4 @@ class TopicAdmin(admin.ModelAdmin):
     fields = [
         "title",
         "description",
-        ]
+    ]

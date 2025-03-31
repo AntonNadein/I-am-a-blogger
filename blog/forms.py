@@ -6,9 +6,9 @@ from users.forms import MixinForms
 
 
 class BlogCreationForm(MixinForms, forms.ModelForm):
-    """ Форма создания и редактирования блога """
+    """Форма создания и редактирования блога"""
 
-    price = forms.CharField(max_length=100, required=False, label='Цена')
+    price = forms.CharField(max_length=100, required=False, label="Цена")
 
     class Meta:
         model = Blog
@@ -22,24 +22,30 @@ class BlogCreationForm(MixinForms, forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
-        """ Изменение формы чекбокса """
+        """Изменение формы чекбокса"""
 
-        self.request = kwargs.pop('request', None)
+        self.request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
-        self.fields['is_published'].widget.attrs.update({
-            'class': 'form-check-label',
-        })
-        self.fields['is_paid'].widget.attrs.update({
-            'class': 'form-check-label',
-            'onclick': 'togglePriceField(this)',
-        })
-        self.fields['price'].widget.attrs.update({
-            'disabled': 'disabled',  # price изначально неактивно
-        })
-        self.fields['price'].widget.attrs['id'] = 'id_price'
+        self.fields["is_published"].widget.attrs.update(
+            {
+                "class": "form-check-label",
+            }
+        )
+        self.fields["is_paid"].widget.attrs.update(
+            {
+                "class": "form-check-label",
+                "onclick": "togglePriceField(this)",
+            }
+        )
+        self.fields["price"].widget.attrs.update(
+            {
+                "disabled": "disabled",  # price изначально неактивно
+            }
+        )
+        self.fields["price"].widget.attrs["id"] = "id_price"
 
     def clean_image(self):
-        """ Проверка размера и формата загружаемого изображения """
+        """Проверка размера и формата загружаемого изображения"""
         image = self.cleaned_data.get("image")
         if image:
             valid_formats = ["image/jpeg", "image/png"]
@@ -64,7 +70,8 @@ class BlogCreationForm(MixinForms, forms.ModelForm):
                 raise ValidationError(
                     "У вас нет действительной привязки к источнику оплаты. "
                     "Пожалуйста, добавьте информацию о платёжной системе. "
-                    "Это можно сделать в редакторе профиля трока Stripe secret")
+                    "Это можно сделать в редакторе профиля трока Stripe secret"
+                )
         return is_paid
 
         # if is_paid:
@@ -82,11 +89,11 @@ class BlogCreationForm(MixinForms, forms.ModelForm):
         # return cleaned_data
 
     def clean_price(self):
-        """ Валидация цены """
+        """Валидация цены"""
 
         if self.cleaned_data.get("is_paid"):
             price = self.cleaned_data.get("price")
-            if price != '':
+            if price != "":
                 if not price.isdigit():
                     raise ValidationError("Введите численное положительное значение")
                 else:

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from blog.models import Blog, Topic, Payment, PaidBlog
+from blog.models import Blog, PaidBlog, Payment, Topic
 from users.models import ModelUser
 
 

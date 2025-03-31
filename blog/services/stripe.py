@@ -2,7 +2,7 @@ import stripe
 
 
 class StripePaid:
-    """ Класс для оплаты Stripe """
+    """Класс для оплаты Stripe"""
 
     def __init__(self, stripe_key: str, name: str, amount: int, pk: int):
         self.stripe_key = stripe_key
@@ -13,7 +13,7 @@ class StripePaid:
         self.price = None
 
     def get_stripe(self):
-        """ Основной метод выполнения страйпа """
+        """Основной метод выполнения страйпа"""
         stripe.api_key = self.stripe_key
         self.create_stripe_product()
         self.create_stripe_price()
