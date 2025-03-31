@@ -5,18 +5,21 @@ from django.db.models import Q
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from blog.forms import BlogCreationForm
 from blog.models import Blog, Topic, Payment, PaidBlog
+from blog.services.cache import CachedViewMixin
 from blog.services.index_page import ServiceIndex
 from blog.services.services_detail import ServiceDetail
 from blog.services.services_create_update import ServiceForm
 
 
-class ListIndex(ServiceIndex, ListView):
+class ListIndex(ServiceIndex, CachedViewMixin, ListView):
     """Главная страница"""
 
     model = Blog
@@ -56,8 +59,13 @@ class ListIndex(ServiceIndex, ListView):
     def get_queryset(self):
         """ QuerySet сортировок архива по месяцам"""
 
+        self.queryset_page = self.get_cached_queryset()
+        if self.queryset_page is not None:
+            return self.queryset_page
+
         self.queryset_page = super().get_queryset()
         page_link = self.request.GET.get('month')
+        self.cache_queryset(self.get_queryset_archive(page_link))
         return self.get_queryset_archive(page_link)
 
 
@@ -72,6 +80,8 @@ class ListArchive(ServiceIndex, ListView):
     template_name = "blog/archive.html"
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """ Контекст для архивной станицы """
+
         context = super().get_context_data(**kwargs)
         self.blog_objects = self.get_queryset()
         context['archives'] = self.get_archives(False)
@@ -79,6 +89,7 @@ class ListArchive(ServiceIndex, ListView):
 
     def get_queryset(self):
         """ QuerySet сортировок архива по месяцам"""
+
         self.queryset_page = super().get_queryset()
         page_link = self.request.GET.get('month')
         return self.get_queryset_archive(page_link)
@@ -92,6 +103,8 @@ class BlogListView(LoginRequiredMixin, ListView):
     template_name = "blog/blog_list.html"
 
     def get_queryset(self):
+        """ QuerySet для моей страницы """
+
         queryset = super().get_queryset()
         user = self.request.user
         if user:
@@ -100,7 +113,7 @@ class BlogListView(LoginRequiredMixin, ListView):
             return queryset.filter(is_published=True)
 
 
-class BlogDetailView(LoginRequiredMixin, ServiceDetail, DetailView):
+class BlogDetailView(LoginRequiredMixin, ServiceDetail, CachedViewMixin, DetailView):
     """ Полная информация о записи """
     model = Blog
     template_name = "blog/blog_detail.html"
@@ -139,6 +152,17 @@ class BlogDetailView(LoginRequiredMixin, ServiceDetail, DetailView):
         context["like"] = self.blog_objects.like.count()
         context["payments"] = self.get_context_payments()
         return context
+
+    def get_queryset(self):
+        """Получает queryset, пытаясь использовать кэш."""
+
+        queryset = self.get_cached_queryset()
+        if queryset is not None:
+            return queryset
+
+        queryset = super().get_queryset()
+        self.cache_queryset(queryset)
+        return queryset
 
 
 class BlogCreateView(LoginRequiredMixin, CreateView):
@@ -233,6 +257,7 @@ class BlogDeleteView(LoginRequiredMixin, DeleteView):
         return super().post(request, *args, **kwargs)
 
 
+@method_decorator(cache_page(60 * 5), name="dispatch")
 class TopicDetailView(DetailView):
     """ Информация о блогах по тематикам """
     model = Topic
@@ -280,6 +305,7 @@ class BlogSearchView(ListView):
         return Blog.objects.none()
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class PaymentDetailView(LoginRequiredMixin, DetailView):
     """ Класс для оплаты контента """
 

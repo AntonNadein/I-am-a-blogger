@@ -1,6 +1,4 @@
-import os
 from django.test import TestCase
-from django.conf import settings
 from blog.models import Blog, PaidBlog, Topic, ModelUser
 from blog.services.services_create_update import ServiceForm
 

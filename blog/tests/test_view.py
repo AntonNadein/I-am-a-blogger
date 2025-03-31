@@ -179,3 +179,19 @@ class BlogViewTest(TestCase):
         self.assertTemplateUsed(response_2, 'blog/payment_confirmation.html')
         self.assertEqual(pay_1.status, "paid")
         self.assertEqual(pay_1.payment_date, datetime.utcnow().date())
+
+    def test_delete_blog_as_owner(self):
+        """ Тест удаление блога как владелец """
+
+        self.client.login(username='testuser', password='password123')
+        response = self.client.post(reverse('blog:blog_delete', kwargs={'pk': self.blog_1.pk}))
+        self.assertRedirects(response, reverse('blog:blog_list'))
+        self.assertFalse(Blog.objects.filter(pk=self.blog_1.pk).exists())
+
+    def test_delete_blog_as_non_owner(self):
+        """ Тест удаления блога как не владелец """
+
+        self.client.login(username='testuser_2', password='password')
+        response = self.client.post(reverse('blog:blog_delete', kwargs={'pk': self.blog_1.pk}))
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Blog.objects.filter(pk=self.blog_1.pk).exists())
