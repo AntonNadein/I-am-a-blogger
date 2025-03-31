@@ -1,7 +1,5 @@
-import os
 from datetime import datetime
 
-from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseForbidden, HttpResponseRedirect
@@ -14,8 +12,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from blog.forms import BlogCreationForm
 from blog.models import Blog, Topic, Payment, PaidBlog
 from blog.services.index_page import ServiceIndex
-from blog.services.stripe import StripePaid
-from config.settings import MEDIA_ROOT
+from blog.services.services_detail import ServiceDetail
+from blog.services.services_create_update import ServiceForm
 
 
 class ListIndex(ServiceIndex, ListView):
@@ -102,7 +100,7 @@ class BlogListView(LoginRequiredMixin, ListView):
             return queryset.filter(is_published=True)
 
 
-class BlogDetailView(LoginRequiredMixin, DetailView):
+class BlogDetailView(LoginRequiredMixin, ServiceDetail, DetailView):
     """ Полная информация о записи """
     model = Blog
     template_name = "blog/blog_detail.html"
@@ -116,67 +114,30 @@ class BlogDetailView(LoginRequiredMixin, DetailView):
         return self.object
 
     def post(self, request, *args, **kwargs):
-        """Включение и отключение подписки"""
-        subscriber = self.request.user
-        owner_blog = get_object_or_404(Blog, id=kwargs.get("pk")).owner
-        subscriber_list = owner_blog.subscriber
+        """ Управление подпиской, оплатой и лайками """
 
-        blog = get_object_or_404(Blog, id=kwargs.get("pk"))
-        likes_list = blog.like
+        self.subscriber = self.request.user
+        self.owner_blog = get_object_or_404(Blog, id=kwargs.get("pk")).owner
+        # подписчики
+        self.manage_subscriber(request)
+        # лайки
+        self.blog = get_object_or_404(Blog, id=kwargs.get("pk"))
+        self.manage_like(request)
+        # оплата
+        if self.manage_payment(request):
+            return HttpResponseRedirect(reverse_lazy("blog:payment_detail", kwargs={"pk": self.payment.pk}))
 
-        if "subscription" in request.POST:
-            if subscriber in subscriber_list.all():
-                subscriber_list.remove(subscriber)
-                message = "Подписка удалена"
-            else:
-                subscriber_list.add(subscriber)
-                message = "Подписка добавлена"
-            messages.success(request, message)
-
-        elif "like" in request.POST:
-            if subscriber in likes_list.all():
-                likes_list.remove(subscriber)
-            else:
-                likes_list.add(subscriber)
-        else:
-            paid_blog = blog.payment
-            payment = Payment.objects.create(buyers=subscriber)
-            try:
-                stripe_key = owner_blog.stripe_secret
-                stripe_pay = StripePaid(stripe_key, paid_blog, blog.payment.price, payment.pk)
-                stripe_id, stripe_url = stripe_pay.get_stripe()
-            except ValueError:
-                return HttpResponseForbidden(
-                    "Пользователь не добавил данные о оплате, обратитесь к администрации сайта.")
-
-            payment.link = stripe_url
-            payment.session_id = stripe_id
-            payment.save()
-            paid_blog.payments.add(payment)
-            return HttpResponseRedirect(reverse_lazy("blog:payment_detail", kwargs={"pk": payment.pk}))
         return HttpResponseRedirect(reverse_lazy("blog:blog_detail", kwargs={"pk": kwargs.get("pk")}))
 
     def get_context_data(self, **kwargs):
         """Контекст для кнопки подписки"""
         context = super().get_context_data()
-        blog_objects = kwargs.get("object")
-        subscriber_list = blog_objects.owner.subscriber.all()
-        user = self.request.user
-        if user in subscriber_list:
-            context["subscriber"] = "Отписаться"
-        else:
-            context["subscriber"] = "Подписаться на автора"
-
-        if user in blog_objects.like.all():
-            context["like_user"] = True
-        else:
-            context["like_user"] = False
-        context["like"] = blog_objects.like.count()
-        if blog_objects.is_paid:
-            list_paid = []
-            for i in blog_objects.payment.payments.filter(status="paid"):
-                list_paid.append(i.buyers)
-            context["payments"] = list_paid
+        self.blog_objects = kwargs.get("object")
+        self.user = self.request.user
+        context["subscriber"] = self.get_context_subscriber()
+        context["like_user"] = self.get_context_like()
+        context["like"] = self.blog_objects.like.count()
+        context["payments"] = self.get_context_payments()
         return context
 
 
@@ -207,7 +168,7 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class BlogUpdateView(LoginRequiredMixin, UpdateView):
+class BlogUpdateView(LoginRequiredMixin, ServiceForm, UpdateView):
     """ Вьюшка обновления своей записи """
     model = Blog
     template_name = "blog/blog_form.html"
@@ -231,40 +192,30 @@ class BlogUpdateView(LoginRequiredMixin, UpdateView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """ Удаление изображения из хранилища """
-        old_image = form.initial.get('image')
-        if form.cleaned_data.get('image') is not None:
-            if old_image != form.cleaned_data.get('image') and old_image.name != '':
-                path_to_image = os.path.join(MEDIA_ROOT, str(old_image))
-                if os.path.exists(path_to_image):
-                    os.remove(path_to_image)
-        blog = form.save()
-        # замена цены
-        price = form.cleaned_data.get("price")
-        is_paid = form.cleaned_data.get("is_paid")
-        if is_paid:
-            if price is not None:
-                try:
-                    paid = blog.payment
-                    paid.price = int(price)
-                    paid.save()
-                except Blog.payment.RelatedObjectDoesNotExist:
-                    PaidBlog.objects.create(paid_blog=blog, price=price)
-
+        """ Удаление изображения из хранилища и обновление цены """
+        self.delete_image_from_media(form)
+        self.blog = form.save()
+        # обновление цены
+        self.price = form.cleaned_data.get("price")
+        self.is_paid = form.cleaned_data.get("is_paid")
+        self.update_price()
         return super().form_valid(form)
 
     def get_initial(self):
         """ Добавление цены в форму, если цена существует """
+
         initial = super().get_initial()
-        blog_instance = self.get_object()
-
-        try:
-            paid_blog_instance = blog_instance.payment
-            initial['price'] = paid_blog_instance.price
-        except PaidBlog.DoesNotExist:
-            # Если нет связанного PaidBlog, просто не добавляем цену
+        self.blog_instance = self.get_object()
+        if self.initial_prise():
+            initial['price'] = self.initial_prise()
+        else:
             initial['price'] = ''
-
+        # try:
+        #     paid_blog_instance = blog_instance.payment
+        #     initial['price'] = paid_blog_instance.price
+        # except PaidBlog.DoesNotExist:
+        #     # Если нет связанного PaidBlog, просто не добавляем цену
+        #     initial['price'] = ''
         return initial
 
 
@@ -290,6 +241,7 @@ class TopicDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         """ Добавление в контекст информации о содержании тематик блогов """
+
         context = super().get_context_data(**kwargs)
         title = self.kwargs.get('title')
         articles = Blog.objects.filter(topic__title=title, is_published=True)
@@ -313,12 +265,14 @@ class TopicDetailView(DetailView):
 
 class BlogSearchView(ListView):
     """ Класс поиска по названию и содержанию записи """
+
     model = Blog
     template_name = 'blog/search_results.html'
     context_object_name = 'blogs'
 
     def get_queryset(self):
         """ Ищет строки, которые содержат некоторую подстроку icontains-поиск не зависит от регистра"""
+
         query = self.request.GET.get('search')
         if query:
             return Blog.objects.filter(
@@ -336,6 +290,7 @@ class PaymentDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Контекст для кнопки подписки"""
+
         context = super().get_context_data()
         blog_objects = kwargs.get("object")
         context["buyer_name"] = blog_objects.buyers.username
@@ -345,6 +300,7 @@ class PaymentDetailView(LoginRequiredMixin, DetailView):
 
 def payment_confirmation(request, pk):
     """ Страница подтверждения оплаты """
+
     payment = get_object_or_404(Payment, pk=pk)
     payment.payment_date = datetime.utcnow().date()
     payment.status = "paid"

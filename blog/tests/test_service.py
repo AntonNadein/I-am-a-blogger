@@ -8,6 +8,7 @@ from users.models import ModelUser
 
 
 class ServiceIndexTestCase(TestCase):
+    """ Тестирование сервисных функций связанных с главной и архивной страницами """
     def setUp(self):
         """ Создаем несколько объектов Blog для тестирования """
 
@@ -37,9 +38,11 @@ class ServiceIndexTestCase(TestCase):
         # Инициализируем сервисный класс с объектами блога
         self.service_index = ServiceIndex()
         self.service_index.blog_objects = Blog.objects.all()
+        self.service_index.queryset_page = Blog.objects.all()
 
     def test_get_max_view_count(self):
         """ Проверяем, что возвращается верный объект с максимальным количеством просмотров """
+
         max_view_blog = self.service_index.get_max_view_count()
         self.assertEqual(max_view_blog, self.blog_5)
 
@@ -73,6 +76,25 @@ class ServiceIndexTestCase(TestCase):
         expected_year = timezone.now().year
         self.assertIn({'year': expected_year, 'month': timezone.now().strftime('%B %Y'), 'count': 4},
                       archives)  # Проверка на правильность данных месяца
+
+    def test_queryset_archive(self):
+        """ Проверяем, возвращение данных в архиве """
+
+        month = timezone.now().strftime('%B %Y')
+        self.blog_5.created_at = (timezone.now() - timedelta(days=40)).date()
+        self.blog_5.save()
+        self.blog_1.is_published = False
+        self.blog_1.save()
+
+        queryset = self.service_index.get_queryset_archive(month)
+        self.assertEqual(len(queryset), 3)
+        self.assertIn(self.blog_2, queryset)
+        self.assertIn(self.blog_3, queryset)
+        self.assertIn(self.blog_4, queryset)
+
+        queryset_none = self.service_index.get_queryset_archive(None)
+        self.assertEqual(len(queryset_none), 4)
+        self.assertNotIn(self.blog_1, queryset)
 
     def tearDown(self):
         """ Очищает данные после тестов """
