@@ -15,6 +15,7 @@ urlpatterns = [
     path("topic_detail/<str:title>/", views.TopicDetailView.as_view(), name="topic_detail"),
     path("archive/", views.ListArchive.as_view(), name="archive"),
     path("search_results/", views.BlogSearchView.as_view(), name="search"),
+    # Работа с оплатой
     path("payment/<int:pk>/", views.PaymentDetailView.as_view(), name="payment_detail"),
     path("payment_confirmation/<int:pk>/", views.payment_confirmation, name="confirmation"),
 ]

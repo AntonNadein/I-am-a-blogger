@@ -47,7 +47,7 @@
             {% endif %}
         </div>
         <div class="col-1">
-            {% if blog.is_paid and user != blog.owner %}
+            {% if blog.is_paid and user != blog.owner and not user in payments %}
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" name="payment" class="ms-2 btn btn-sm btn-outline-secondary">Купить</button>
