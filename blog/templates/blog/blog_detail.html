@@ -1,0 +1,66 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ object.title }}{% endblock %}
+{% block content %}
+
+<h1 class="mt-5 text-center">{{ blog.title }}</h1>
+<div class="col-1"></div>
+<div class="col-12">
+    <div class="mt-5 card-body">
+        {% if not blog.is_paid or user in payments or user == blog.owner %}
+        {% if blog.image %}
+        <img class="rounded float-start img-fluid" width="50%" height="200" src="{{ object.image.url }}">
+        {% endif %}
+        <p class="card-text">{{ blog.blog_text|safe }}</p>
+        <p>Автор: {{ blog.owner.username }}</p>
+        <p>Дата публикации: {{ blog.created_at|date:"d M Y" }}</p>
+        {% else %}
+        <h3 class="text-center">Продолжить чтение можно только после покупки. </h3>
+        <h4>Цена: {{ blog.payment.price }} </h4>
+        <p>{{ blog.blog_text|truncatechars:100|safe }}</p>
+        <p>Автор: {{ blog.owner.username }}</p>
+        <p>Дата публикации: {{ blog.created_at|date:"d M Y" }}</p>
+        {% endif %}
+    </div>
+    <div class="col-12 d-flex justify-content-end align-items-center">
+        <div class="col-11">
+            <a href="#" class="mt-2 btn btn-sm btn-outline-secondary">Просмотры: {{ blog.view_count }}</a>
+            {% if user != blog.owner %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="subscription" class="mt-2 btn btn-sm {% if subscriber == 'Отписаться' %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">{{ subscriber }}</button>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li
+                    {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </form>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="like" class="mt-2 btn btn-sm {% if like_user %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">Лайк: {{ like }}</button>
+            </form>
+            {% else %}
+            <button class="mt-2 btn btn-sm btn-outline-secondary">{{ subscriber }}</button>
+            <button class="mt-2 btn btn-sm btn-outline-secondary">Лайк: {{ like }}</button>
+            {% endif %}
+        </div>
+        <div class="col-1">
+            {% if blog.is_paid and user != blog.owner and not user in payments %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="payment" class="ms-2 btn btn-sm btn-outline-secondary">Купить</button>
+                </form>
+            {% endif %}
+            {% if user == blog.owner %}
+            <a href="{% url 'blog:blog_update' object.pk %}"
+               class="ms-2 btn btn-sm btn-outline-secondary">Редактировать</a>
+            <a href="{% url 'blog:blog_delete' object.pk %}" class="mt-2 ms-2 btn btn-sm btn-outline-danger">Удалить</a>
+            {% endif %}
+            <a href="{% url 'blog:blog_list' %}" class="mt-2 ms-2 btn btn-sm btn-outline-primary">Мой блог</a>
+            <a href="{% url 'blog:index' %}" class="mt-2 ms-2 btn btn-sm btn-outline-primary">Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

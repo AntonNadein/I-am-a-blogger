@@ -1,0 +1,20 @@
+{% extends 'blog/base.html' %}
+
+{% block title%}Удаление записи{% endblock%}
+
+{% block content %}
+<h2 class="mt-5 text-center">Удаление записи</h2>
+<div class="col-12 text-center">
+    <div>
+        <p>Вы действительно хотите удалить: {{ object.title }}?</p>
+        <form method="post">
+            {% csrf_token %}
+            {% if user == blog.owner %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Подтвердить</button>
+            {% endif %}
+            <a href="{% url 'blog:blog_list' %}" class="btn btn-sm btn-outline-primary">Отменить</a>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

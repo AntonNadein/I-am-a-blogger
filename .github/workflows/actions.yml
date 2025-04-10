@@ -1,0 +1,110 @@
+name: Diary-blog CI
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Flake8
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8
+
+      - name: Pun Flake8
+        run: flake8 .
+
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+          poetry install --no-root
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV }}" > .env
+
+      - name: Run tests
+        run: python manage.py test
+
+
+#  build:
+#    needs: test
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Check out code
+#        uses: actions/checkout@v3
+#
+#      - name: Log in in Docker hub
+#        run: echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+#
+#      - name: Build Docker image
+#        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }} .
+#
+#      - name: Push Docker image in Docker hub
+#        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+#
+#
+#  deploy:
+#    needs: build
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Set up SSH
+#        uses: webfactory/ssh-agent@v0.9.0
+#        with:
+#          ssh-private-key: ${{ secrets.SSH_KEY }}
+#
+#      - name: Deploy to Server
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+#            if [ -d "./${{ secrets.REPO_NAME }}" ]; then
+#              cd ./${{ secrets.REPO_NAME }}
+#              docker-compose down || true
+#              git pull || true
+#              echo "${{ secrets.ENV }}" > .env
+#              docker-compose up -d
+#            else
+#            # Директория не найдена, выполняем первый деплой из ветки git
+#              git clone -b {{ secrets.BRANCH }} https://github.com/AntonNadein/${{ secrets.REPO_NAME }}.git
+#              cd ./{{ secrets.REPO_NAME }}
+#              echo "${{ secrets.ENV }}" > .env
+#              sudo docker-compose up -d
+#            fi
+#          EOF

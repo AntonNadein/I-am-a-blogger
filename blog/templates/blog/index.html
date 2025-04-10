@@ -1,0 +1,115 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+{% if max_object_queryset %}
+<div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
+    <div class="col-lg-8 px-0">
+        <h1 class="display-5 fst-italic">{{ max_object_queryset.title }}</h1>
+        <p class="lead my-3">{{ max_object_queryset.topic }}.</p>
+        <p class="lead my-3">Автор: {{ max_object_queryset.owner }}</p>
+        <p class="lead mb-0"><a href="{% url 'blog:blog_detail' max_object_queryset.pk %}"
+                                class="text-body-emphasis fw-bold">Подробнее...</a></p>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+                <strong class="d-inline-block mb-2 text-primary-emphasis">{{ max_like_today.topic }}</strong>
+                <h3 class="mb-0">{{ max_like_today.title }}</h3>
+                <div class="mb-1 text-body-secondary">{{ max_like_today.created_at }}</div>
+                <a href="{% url 'blog:blog_detail' max_like_today.pk %}"
+                   class="icon-link gap-1 icon-link-hover stretched-link">
+                    Продолжить чтение
+                    <svg class="bi">
+                        <use xlink:href="#chevron-right"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="align-self-center col-auto d-none d-lg-block">
+                <img class="rounded mx-auto d-block" width="200" height="150"
+                     src="{% if max_like_today.image %}{{ max_like_today.image.url }}{% else %}../../../media/avatars/unnamed.jpg{% endif %}"
+                     alt="Thumbnail">
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+                <strong class="d-inline-block mb-2 text-success-emphasis">{{ max_like_month.topic }}</strong>
+                <h3 class="mb-0">{{ max_like_month.title }}</h3>
+                <div class="mb-1 text-body-secondary">{{ max_like_month.created_at }}</div>
+                <a href="{% url 'blog:blog_detail' max_like_month.pk %}"
+                   class="icon-link gap-1 icon-link-hover stretched-link">
+                    Продолжить чтение
+                    <svg class="bi">
+                        <use xlink:href="#chevron-right"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="align-self-center col-auto d-none d-lg-block">
+                <img class="rounded mx-auto d-block" width="200" height="150"
+                     src="{% if max_like_month.image %}{{ max_like_month.image.url }}{% else %}../../../media/avatars/unnamed.jpg{% endif %}"
+                     alt="Thumbnail">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-5">
+    <div class="col-md-8">
+        <h3 class="pb-4 mb-4 fst-italic border-bottom">
+            Последние опубликованные статьи
+        </h3>
+        {% for b in blog %}
+        <article class="blog-post">
+            <h2 class="display-5 link-body-emphasis mb-1">{{ b.title }}</h2>
+            <p class="blog-post-meta">{{ b.created_at }} by <a href="{% url 'blog:blog_detail' b.pk %}">Подробнее</a>
+            </p>
+            <p>{{ b.blog_text|truncatechars:500|safe }}.</p>
+            <hr>
+        </article>
+        {% endfor %}
+        {% include 'blog/includes/nav_pagination.html' %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="position-sticky" style="top: 2rem;">
+            <div class="p-4 mb-3 bg-body-tertiary rounded">
+                <h4 class="fst-italic">Еще контент</h4>
+                <p class="mb-0">На этом месте могла быть ваша реклама :)</p>
+            </div>
+
+            <div>
+                <h4 class="fst-italic">Последние статьи</h4>
+                <ul class="list-unstyled">
+                    {% for article in last_three_articles %}
+                    <li>
+                        <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
+                           href="{% url 'blog:blog_detail' article.pk %}">
+                            <div class="align-self-center col-auto d-none d-lg-block">
+                                <img class="rounded mx-auto d-block" width="150" height="100"
+                                     src="{% if article.image %}{{ article.image.url }}{% else %}../../../media/avatars/unnamed.jpg{% endif %}"
+                                     alt="Thumbnail">
+                            </div>
+                            <div class="col-lg-8">
+                                <h6 class="mb-0">{{ article.title }}</h6>
+                                <small class="text-body-secondary">{{ article.created_at }}</small>
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="p-4">
+                {% include 'blog/includes/archive.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<h1 class="display-5 fst-italic text-center">Нет записей для вывода на главную страницу</h1>
+{% endif %}
+{% endblock %}

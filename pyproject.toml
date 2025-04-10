@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "blog"
+version = "0.1.0"
+description = "diploma project for skypro"
+authors = ["Anton"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1.7"
+python-dotenv = "^1.0.1"
+psycopg2-binary = "^2.9.10"
+redis = "^5.2.1"
+pillow = "^11.0.0"
+ipython = "^8.29.0"
+gunicorn = "^23.0.0"
+django-ckeditor = "^6.7.2"
+stripe = "^11.6.0"
+
+cryptography = "^44.0.2"
+coverage = "^7.7.1"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.lint.dependencies]
+black = "^24.4.2"
+flake8 = "^7.1.0"
+isort = "^5.13.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest-cov = "^5.0.0"
+pytest = "^8.3.2"
+
+[tool.black]
+line-length = 119
+exclude = '''
+(
+  /(
+      \.eggs         # Исключить несколько общих каталогов
+    | \.git          # в корне проекта
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | dist
+  )/
+  | foo.py           # Также отдельно исключить файл с именем foo.py
+                     # в корне проекта
+)
+'''
+
+[tool.isort]
+line_length = 119

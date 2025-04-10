@@ -1,0 +1,54 @@
+<div class="container">
+    <header class="border-bottom lh-1 py-3">
+        <div class="row flex-nowrap justify-content-between align-items-center">
+            <div class="col-4 pt-1">
+                <a class="fs-4 blog-header-logo text-body-emphasis text-decoration-none" href="{% url 'blog:index' %}">Главная страница</a>
+
+            </div>
+            <div class="col-4 text-center">
+                <a class="fs-1 blog-header-logo text-body-emphasis text-decoration-none" href="{% url 'blog:index' %}">Личный дневник, или блог?</a>
+            </div>
+            <div class="col-4 d-flex justify-content-end align-items-center">
+                {% if user.is_authenticated %}
+                {% if perms.users.can_block_user %}
+                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:moderation_user_list' %}">Список пользователей</a>
+                {% endif %}
+                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'blog:blog_list' %}">Мой блог</a>
+                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:profile' user.pk %}">Профиль</a>
+                <form method="post" action="{% url 'users:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="ms-2 btn btn-sm btn-outline-secondary">Выйти
+                    </button>
+                </form>
+                {% else %}
+                <a class="ms-2 btn btn-sm btn-outline-secondary"
+                   href="{% url 'users:register' %}">Зарегистрироваться</a>
+                <a class="ms-2 btn btn-sm btn-outline-secondary" href="{% url 'users:login' %}">Войти</a>
+
+
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-scroller py-1 mb-3 border-bottom">
+        <nav class="nav nav-underline justify-content-between">
+            {% for topic in topic_list %}
+            {% if topic.title == topic_title %}
+                <a class="nav-item nav-link link-body-emphasis active" href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% else %}
+            <a class="nav-item nav-link link-body-emphasis"
+               href="{% url 'blog:topic_detail' topic.title %}">{{ topic.title }}</a>
+            {% endif %}
+            {% endfor %}
+        </nav>
+        <nav>
+            <div class="d-flex flex-row-reverse bd-highlight">
+            <form class="d-flex" method="get" action="{% url 'blog:search' %}">
+                    <input class="form-control me-2" name="search" type="search" placeholder="Введите текст" value="{{ request.GET.search|default:'' }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Найти</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,82 @@
+[
+{
+    "model": "blog.topic",
+    "pk": 1,
+    "fields": {
+        "title": "Путешествия",
+        "description": "Блог о путешествиях в различные города и страны."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 2,
+    "fields": {
+        "title": "Мода",
+        "description": "Все о моде."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 3,
+    "fields": {
+        "title": "Здоровье",
+        "description": "От ЗОЖ, до медицинских инноваций."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 4,
+    "fields": {
+        "title": "Наука",
+        "description": "Достижения и прогресс."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 5,
+    "fields": {
+        "title": "Политика",
+        "description": "Скандалы, интриги, расследования."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 6,
+    "fields": {
+        "title": "Финансы и бизнес",
+        "description": "Фондовые рынки и прибыль"
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 7,
+    "fields": {
+        "title": "Технологии",
+        "description": "Все о научном прогрессе"
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 8,
+    "fields": {
+        "title": "Строительство и дизайн",
+        "description": "Все что не делается, все к лучшему."
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 9,
+    "fields": {
+        "title": "Личное",
+        "description": "Блог о себе и для себя"
+    }
+},
+{
+    "model": "blog.topic",
+    "pk": 10,
+    "fields": {
+        "title": "Хобби",
+        "description": "От рыбалки до вышивания"
+    }
+}
+]

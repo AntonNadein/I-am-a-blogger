@@ -1,0 +1,35 @@
+{% extends 'blog/base.html' %}
+{% block title %}Архив{% endblock %}
+{% block content %}
+
+<h1 class="mt-5 text-center">Архив</h1>
+<div class="row">
+<div class="col-10">
+    <div class="mt-2 row row-cols-1 row-cols-md-1 g-4">
+        <div class="col">
+            {% for article in object_list %}
+            <div class="mt-5 card text-start border-dark">
+                <h4 class="card-header">{{ article.title }}</h4>
+                <a href="{% url 'blog:blog_detail' article.pk %}" class="btn btn-light border-secondary text-secondary">Подробнее</a>
+                <div class="card-body text-center">
+                    {% if article.image %}
+                    <img class="rounded float-start img-fluid" width="20%" height="200" src="{{ article.image.url }}">
+                    {% endif %}
+                    <p class="card-text">{{ article.blog_text|truncatechars:300|safe }}</p>
+                </div>
+            </div>
+
+            {% endfor %}
+            <div class="col-1">
+            </div>
+
+        </div>
+    </div>
+</div>
+    <div class="col-2 mt-5 row row-cols-1 row-cols-md-1 g-4">
+{% include 'blog/includes/archive.html' %}
+    </div>
+</div>
+<hr>
+{% include 'blog/includes/nav_pagination.html' %}
+{% endblock %}
